@@ -6,12 +6,16 @@ export default class ColumnChart {
       : props.data.reduce((acc, item) => acc + item, 0);
     this.label = props.label == "" ? "" : props.label;
     this.link = props.link;
-    this.value = props.value;
+    this.value =
+      this.label == "sales"
+        ? `$${props.value.toLocaleString("en-US")}`
+        : props.value;
     this.element = this.createElement(this.createTemplate());
   }
 
   createTemplate() {
-    return `
+    if (this.data) {
+      return `
     <div id="${this.label}" class="dashboard__chart_${this.label}">
     <div class="column-chart" style="--chart-height: 50">
       <div class="column-chart__title">
@@ -26,10 +30,11 @@ export default class ColumnChart {
         </div>
       </div>
     </div>`;
+    }
   }
 
   createElement(template) {
-    let element = document.createElement("div");
+    const element = document.createElement("div");
     element.innerHTML = template;
     return element.firstElementChild;
   }
@@ -41,7 +46,7 @@ export default class ColumnChart {
     return this.data
       .map(
         (element) =>
-          `<div style="--value: ${element}" 
+          `<div style="--value: ${(element / this.total) * 100}" 
           data-tooltip=${(element / this.total) * 100}%></div>`
       )
       .join("");
