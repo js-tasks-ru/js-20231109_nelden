@@ -11,6 +11,7 @@ export default class ColumnChart {
         ? `$${props.value.toLocaleString("en-US")}`
         : props.value;
     this.element = this.createElement(this.createTemplate());
+    this.chartHeight = 50;
   }
 
   createElement(template) {
@@ -64,4 +65,9 @@ export default class ColumnChart {
     this.element.querySelector(".column-chart__chart").innerHTML =
       newChartBodyTemplate;
   }
+
+  destroy() {
+    this.element.remove();
+  }
+   
 }
