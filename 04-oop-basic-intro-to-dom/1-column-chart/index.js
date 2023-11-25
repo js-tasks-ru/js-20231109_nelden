@@ -1,73 +1,94 @@
+
+function formatHeading(value, label) {
+  if (label == 'sales') {
+    return '$' + value.toLocaleString('en-US');
+  }
+  return value;
+}
+
 export default class ColumnChart {
-  constructor(props) {
-    this.data = !Array.isArray(props.data) ? [0] : props.data;
-    this.total = !Array.isArray(props.data)
-      ? 0
-      : props.data.reduce((acc, item) => acc + item, 0);
-    this.label = props.label == "" ? "Empty label" : props.label;
-    this.link = props.link;
-    this.value =
-      this.label == "sales"
-        ? `$${props.value.toLocaleString("en-US")}`
-        : props.value;
-    this.element = this.createElement(this.createTemplate());
+  constructor({ data = [], label = '', link = '', value = 0 } = {}) {
+    this.data = data;
+    this.label = label;
+    this.link = link;
+    this.value = Number(value);
+    this.formatHeading = formatHeading;
+    this.value = this.formatHeading(this.value, this.label);
     this.chartHeight = 50;
+    this.total = this.data.reduce((acc, item) => acc + item, 0);
+    this.element = this.createElement();
+  }
+   
+  getValuePercentage(data) {
+    const maxValue = Math.max(...data);
+    const scale = this.chartHeight / maxValue;
+    return data.map(item => {
+      return {
+        percent: (item / maxValue * 100).toFixed(0) + '%',
+        value: String(Math.floor(item * scale))
+      };
+    });
   }
 
-  createElement(template) {
-    const element = document.createElement("div");
-    element.innerHTML = template;
-    return element.firstElementChild;
+  createBodyTemplate() {
+    if (this.data != 0) {
+      return this.getValuePercentage(this.data).map((item) => `
+      <div style="--value: ${item.value}" data-tooltip=${item.percent}></div>`
+      ).join("");}
+    return `<img src='./charts-skeleton.svg'></img>`;
+  }
+   
+
+  createChartTemplate() {
+    return `
+    <div class="column-chart" style="--chart-height: ${this.chartHeight}">
+    <div class="column-chart__title">
+      Total ${this.label}
+      <a href=${this.link} class="column-chart__link">View all</a>
+    </div>
+    <div class="column-chart__container">
+      <div data-element="header" class="column-chart__header">${this.value}</div>
+      <div data-element="body" class="column-chart__chart">${this.createBodyTemplate()}</div>
+    </div>
+  </div>`;
   }
 
-  createTemplate() {
-    if (this.data) {
-      return `
-    <div id="${this.label}" class="dashboard__chart_${this.label}">
-    <div class="column-chart" style="--chart-height: 50">
-      <div class="column-chart__title">${this.label}
-        <a href="/${this.label}" class="column-chart__link">${this.link}</a>
-      </div>
-      <div class="column-chart__container">
-        <div data-element="header" class="column-chart__header">
-        ${this.value}</div>
-        <div data-element="body" class="column-chart__chart">
-        ${this.createChartBodyTemplate(this.data)}
+  createChartTemplateLoading() {
+    return `
+          <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
+            <div class="column-chart__title">
+              Total ${this.label}
+              <a class="column-chart__link" href="#">View all</a>
+            </div>
+            <div class="column-chart__container">
+              <div data-element="header" class="column-chart__header"></div>
+              <div data-element="body" class="column-chart__chart"></div>
         </div>
-      </div>
-    </div>`;
-    }
+      </div>`;
   }
+   
 
-  createChartBodyTemplate(data) {
-    const maxValue = Math.max(...this.data);
-    const scale = 50 / maxValue;
-    if (data == 0) {
-      return `<img src='./charts-skeleton.svg'></img>`;
+  createElement() {
+    const element = document.createElement('div');
+    if (!this.keys) {
+      document.body.insertAdjacentHTML('beforeend', this.createChartTemplateLoading());
+    } else {
+      element.innerHTML = this.createChartTemplate();
     }
-    return this.data
-      .map(
-        (item) =>
-          `<div style="--value: ${String(Math.floor(item * scale))}" 
-          data-tooltip=${((item / maxValue) * 100).toFixed(0) + "%"}></div>`
-      )
-      .join("");
+    return element;
   }
 
   update(newData) {
-    this.data = !Array.isArray(newData) ? 0 : newData;
-    this.total = !Array.isArray(newData)
-      ? 0
-      : newData.reduce((acc, item) => acc + item, 0);
+    const newChartBodyTemplate = this.createBodyTemplate(newData);
 
-    const newChartBodyTemplate = this.createChartBodyTemplate(this.data);
+    this.element.querySelector(".column-chart__chart").innerHTML = newChartBodyTemplate;
+  }
 
-    this.element.querySelector(".column-chart__chart").innerHTML =
-      newChartBodyTemplate;
+  remove() {
+    this.element.remove();
   }
 
   destroy() {
-    this.element.remove();
+    this.remove();
   }
-   
 }
