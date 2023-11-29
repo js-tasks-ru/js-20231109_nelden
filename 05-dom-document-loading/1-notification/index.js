@@ -1,4 +1,6 @@
 export default class NotificationMessage {
+  static LastNotification = null;
+
   constructor(
     message = "Hello, world",
     { duration = 7000, type = "success" } = {}
@@ -9,7 +11,6 @@ export default class NotificationMessage {
 
     this.updateBtn();
     this.element = this.createElement();
-    this.removeByTimeOut();
   }
 
   updateBtn() {
@@ -36,19 +37,20 @@ export default class NotificationMessage {
     </div>`;
   }
 
-  show(element = this.createElement()) {
-    document.body.appendChild(element);
-  }
-
-  destroy() {
-    this.remove();
+  show(element = document.body) {
+    if (NotificationMessage.LastNotification) {
+      NotificationMessage.LastNotification.remove();
+    }
+    element.append(this.element);
+    NotificationMessage.LastNotification = this;
+    setTimeout(() => this.remove(), this.duration);
   }
 
   remove() {
     this.element.remove();
   }
 
-  removeByTimeOut() {
-    setTimeout(() => this.element.remove());
+  destroy() {
+    this.remove();
   }
 }
