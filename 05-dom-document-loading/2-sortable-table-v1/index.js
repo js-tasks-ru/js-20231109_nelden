@@ -14,18 +14,20 @@ export default class SortableTable {
     return div;
   }
 
-  createTableHeaderTemplate(sortOrder = "asc") {
-    const div = document.createElement("div");
-    div.innerHTML =
-      '<div data-element="header" class="sortable-table__header sortable-table__row"></div>';
-    div.outerHTML = this.headerConfig
+  createTableHeaderTemplate() {
+    const div = this.headerConfig
       .map(
-        (item) => `
-      <div class="sortable-table__cell" data-id=${item.id} data-sortable=${item.sortable} data-order=${sortOrder}>
-        <span>${item.title}</span>`
+        (item) =>
+          `
+    <div class="sortable-table__cell" data-id=${item.id} data-sortable=${item.sortable} data-order="asc">
+      <span>${item.title}</span>
+    </div>`
       )
-      .join();
-    return div;
+      .join("");
+    return `
+    <div data-element="header" class="sortable-table__header sortable-table__row">
+        ${div}
+    </div>`;
   }
 
   createTableBodyTemplate() {
