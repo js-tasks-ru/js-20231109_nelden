@@ -3,6 +3,9 @@ export default class SortableTable {
     this.headerConfig = headerConfig;
     this.data = data;
     this.element = this.createElement();
+    this.sortValue = document.querySelectorAll("[selected]")[0].text;
+    this.sortOrder = document.querySelectorAll("[selected]")[1].text;
+    this.sort(this.sortValue, this.sortOrder);
   }
 
   createElement() {
@@ -19,7 +22,7 @@ export default class SortableTable {
       .map(
         (item) =>
           `
-    <div class="sortable-table__cell" data-id=${item.id} data-sortable=${item.sortable} data-order="asc">
+    <div class="sortable-table__cell" data-id=${item.id} data-sortable=${item.sortable} data-order=${this.sortOrder}>
       <span>${item.title}</span>
     </div>`
       )
