@@ -45,8 +45,7 @@ export default class SortableTable {
 
   createProductMatrixTemplate() {
     return this.data.map((item) => {
-      const imageUrl =
-        item.images.length > 0 ? item.images[0].url : "default-image-url"; // Замените 'default-image-url' на URL изображения по умолчанию
+      const imageUrl = item.images[0].url;
       return `
           <a href="/products/${item.id}" class="sortable-table__row">
             <div class="sortable-table__cell">
