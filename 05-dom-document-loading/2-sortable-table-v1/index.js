@@ -41,18 +41,15 @@ export default class SortableTable {
 
   createProductMatrixTemplate() {
     return this.data.map((item) => {
-      const imageUrl = item.images[0].url;
       return `
           <a href="/products/${item.id}" class="sortable-table__row">
-            <div class="sortable-table__cell">
-              <img class="sortable-table-image" alt="Image" src="${imageUrl}">
-            </div>
+            ${this.headerConfig[0].template(item.images)}
             <div class="sortable-table__cell">${item.title}</div>
             <div class="sortable-table__cell">${item.quantity}</div>
             <div class="sortable-table__cell">${item.price}</div>
             <div class="sortable-table__cell">${item.sales}</div>
           </a>`;
-    });
+    }).join("");
   }
 
   sort(fieldValue, orderValue) {}
