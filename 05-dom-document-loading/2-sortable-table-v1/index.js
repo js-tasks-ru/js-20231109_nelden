@@ -3,8 +3,7 @@ export default class SortableTable {
     this.headerConfig = headerConfig;
     this.data = data;
     this.element = this.createElement();
-    this.sortValue = document.querySelectorAll("[selected]")[0].text;
-    this.sortOrder = document.querySelectorAll("[selected]")[1].text;
+    this.sortField = document.getElementById("field").querySelector('[selected]').getAttribute("value");
     this.sort(this.sortValue, this.sortOrder);
   }
 
@@ -18,6 +17,7 @@ export default class SortableTable {
   }
 
   createTableHeaderTemplate() {
+    this.sortOrder = document.getElementById("order").querySelector('[selected]').getAttribute("value");
     const template = this.headerConfig
       .map(
         (item) => {
@@ -62,7 +62,14 @@ export default class SortableTable {
     }).join("");
   }
 
-  sort(fieldValue, orderValue) {}
+  updateSortOrder() {
+
+  }
+
+  sort(fieldValue, orderValue) {
+    const table = document.querySelector("#sortableTable");
+
+  }
 
   remove() {
     this.element.remove();
