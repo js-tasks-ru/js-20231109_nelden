@@ -18,18 +18,28 @@ export default class SortableTable {
   }
 
   createTableHeaderTemplate() {
-    const div = this.headerConfig
+    const template = this.headerConfig
       .map(
-        (item) =>
-          `
-    <div class="sortable-table__cell" data-id=${item.id} data-sortable=${item.sortable} data-order=${this.sortOrder}>
+        (item) => {
+          if (item.title === "Name") {
+            return `
+            <div class="sortable-table__cell" data-id=${item.id} data-sortable=${item.sortable} data-order=${this.sortOrder}>
+              <span>${item.title}</span>
+              <span data-element="arrow" class="sortable-table__sort-arrow">
+                <span class="sort-arrow"></span>
+              </span>
+          </div>`;
+          }
+          return `<div class="sortable-table__cell" data-id=${item.id} data-sortable=${item.sortable} data-order=${this.sortOrder}>
       <span>${item.title}</span>
-    </div>`
+    </div>`;
+        }
       )
       .join("");
+
     return `
     <div data-element="header" class="sortable-table__header sortable-table__row">
-        ${div}
+        ${template}
     </div>`;
   }
 
