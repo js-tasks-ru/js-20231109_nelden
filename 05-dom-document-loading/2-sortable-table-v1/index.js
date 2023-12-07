@@ -3,11 +3,7 @@ export default class SortableTable {
     this.headerConfig = headerConfig;
     this.data = data;
     this.element = this.createElement();
-    this.sortField = document
-      .getElementById("field")
-      .querySelector("[selected]")
-      .getAttribute("value");
-    this.sort(this.sortValue, this.sortOrder);
+    this.sortType = this.getSortType();
   }
 
   createElement() {
@@ -77,6 +73,15 @@ export default class SortableTable {
     return idx.filter((item) => item); 
   }
 
+
+  getSortType(sortField) {
+    let sortType = this.headerConfig.map((item) => {
+      if (item.id == sortField) {
+        return item.sortType;
+      }
+      return sortType.filter((item) => item);
+    });
+  }
 
   sortByASC(node, idx) {
     return Array.from(node).sort((a, b) => {
