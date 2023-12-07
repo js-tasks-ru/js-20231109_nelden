@@ -62,13 +62,47 @@ export default class SortableTable {
     }).join("");
   }
 
-  updateSortOrder() {
 
+  getSortFieldIndex(sortField) {
+    let idx = this.headerConfig.map((item, index) => {
+      if (item.id == sortField) {
+        return index;
+      }});
+    return idx.filter((item) => item); 
   }
 
-  sort(fieldValue, orderValue) {
-    const table = document.querySelector("#sortableTable");
 
+  sortByASC(node, idx) {
+    return Array.from(node).sort((a, b) => {
+      let textA = a.querySelectorAll('.sortable-table__cell')[idx].textContent;
+      let textB = b.querySelectorAll('.sortable-table__cell')[idx].textContent;
+      return textA.localeCompare(textB);
+    });
+  }
+
+  sortByDESC(node, idx) {
+    return Array.from(node).sort((a, b) => {
+      let textA = a.querySelectorAll('.sortable-table__cell')[idx].textContent;
+      let textB = b.querySelectorAll('.sortable-table__cell')[idx].textContent;
+      return textB.localeCompare(textA);
+    });
+  }
+
+
+  sortByOrder(orderValue, node, idx) {
+    if (orderValue == 'asc') {
+      return this.sortByASC(node, idx);
+    }
+    return this.sortByDESC(node, idx);
+  }
+
+
+  sort(fieldValue, orderValue) {
+    const rows = document.querySelectorAll('div.sortable-table__body > a');
+    const idx = this.getSortFieldIndex(fieldValue);
+    let body = document.querySelectorAll('div.sortable-table__body')[0];
+    const sorted = this.sortByOrder(orderValue, rows, idx);
+    sorted.forEach(item => body.appendChild(item));
   }
 
   remove() {
