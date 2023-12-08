@@ -3,7 +3,6 @@ export default class SortableTable {
     this.headerConfig = headerConfig;
     this.data = data;
     this.element = this.createElement();
-    this.sortType = this.getSortType();
   }
 
   createElement() {
@@ -16,15 +15,12 @@ export default class SortableTable {
   }
 
   createTableHeaderTemplate() {
-    this.sortOrder = document
-      .getElementById("order")
-      .querySelector("[selected]")
-      .getAttribute("value");
+    const sortOrder = order.firstElementChild.text;
     const template = this.headerConfig
       .map((item) => {
         if (item.title === "Name") {
           return `
-            <div class="sortable-table__cell" data-id=${item.id} data-sortable=${item.sortable} data-order=${this.sortOrder}>
+            <div class="sortable-table__cell" data-id=${item.id} data-sortable=${item.sortable} data-order=${sortOrder}>
               <span>${item.title}</span>
               <span data-element="arrow" class="sortable-table__sort-arrow">
                 <span class="sort-arrow"></span>
@@ -64,56 +60,54 @@ export default class SortableTable {
       .join("");
   }
 
-
   getSortFieldIndex(sortField) {
     let idx = this.headerConfig.map((item, index) => {
       if (item.id == sortField) {
         return index;
-      }});
-    return idx.filter((item) => item); 
+      }
+    });
+    return idx.filter((item) => item);
   }
-
 
   getSortType(sortField) {
     let sortType = this.headerConfig.map((item) => {
       if (item.id == sortField) {
         return item.sortType;
       }
-      return sortType.filter((item) => item);
     });
+    return sortType.filter((item) => item);
   }
 
-  sortByASC(node, idx) {
+  sortByASC(node, idx, numeric) {
     return Array.from(node).sort((a, b) => {
-      let textA = a.querySelectorAll('.sortable-table__cell')[idx].textContent;
-      let textB = b.querySelectorAll('.sortable-table__cell')[idx].textContent;
-      return textA.localeCompare(textB);
+      let textA = a.querySelectorAll(".sortable-table__cell")[idx].textContent;
+      let textB = b.querySelectorAll(".sortable-table__cell")[idx].textContent;
+      return textA.localeCompare(textB, undefined, { numeric: numeric });
     });
   }
 
-  sortByDESC(node, idx) {
+  sortByDESC(node, idx, numeric) {
     return Array.from(node).sort((a, b) => {
-      let textA = a.querySelectorAll('.sortable-table__cell')[idx].textContent;
-      let textB = b.querySelectorAll('.sortable-table__cell')[idx].textContent;
-      return textB.localeCompare(textA);
+      let textA = a.querySelectorAll(".sortable-table__cell")[idx].textContent;
+      let textB = b.querySelectorAll(".sortable-table__cell")[idx].textContent;
+      return textB.localeCompare(textA, undefined, { numeric: numeric });
     });
   }
 
-
-  sortByOrder(orderValue, node, idx) {
-    if (orderValue == 'asc') {
-      return this.sortByASC(node, idx);
+  sortByOrder(orderValue, node, idx, numeric) {
+    if (orderValue == "asc") {
+      return this.sortByASC(node, idx, numeric);
     }
-    return this.sortByDESC(node, idx);
+    return this.sortByDESC(node, idx, numeric);
   }
-
 
   sort(fieldValue, orderValue) {
-    const rows = document.querySelectorAll('div.sortable-table__body > a');
+    const rows = document.querySelectorAll("div.sortable-table__body > a");
     const idx = this.getSortFieldIndex(fieldValue);
-    let body = document.querySelectorAll('div.sortable-table__body')[0];
-    const sorted = this.sortByOrder(orderValue, rows, idx);
-    sorted.forEach(item => body.appendChild(item));
+    let body = document.querySelector("div.sortable-table__body");
+    const isNumeric = this.getSortType(fieldValue) == "number";
+    const sorted = this.sortByOrder(orderValue, rows, idx, isNumeric);
+    sorted.forEach((item) => body.appendChild(item));
   }
 
   remove() {
