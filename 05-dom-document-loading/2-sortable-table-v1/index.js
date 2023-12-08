@@ -15,12 +15,14 @@ export default class SortableTable {
   }
 
   createTableHeaderTemplate() {
-    const sortOrder = order.firstElementChild.text;
+    window.onload = function () {
+      this.sortOrder = order.firstElementChild?.text;
+    };
     const template = this.headerConfig
       .map((item) => {
         if (item.title === "Name") {
           return `
-            <div class="sortable-table__cell" data-id=${item.id} data-sortable=${item.sortable} data-order=${sortOrder}>
+            <div class="sortable-table__cell" data-id=${item.id} data-sortable=${item.sortable} data-order=${this.sortOrder}>
               <span>${item.title}</span>
               <span data-element="arrow" class="sortable-table__sort-arrow">
                 <span class="sort-arrow"></span>
@@ -46,11 +48,12 @@ export default class SortableTable {
   }
 
   createProductMatrixTemplate() {
+    const template = this.headerConfig[0].template;
     return this.data
       .map((item) => {
         return `
           <a href="/products/${item.id}" class="sortable-table__row">
-            ${this.headerConfig[0].template(item.images)}
+            ${template(item.images)}
             <div class="sortable-table__cell">${item.title}</div>
             <div class="sortable-table__cell">${item.quantity}</div>
             <div class="sortable-table__cell">${item.price}</div>
@@ -78,27 +81,27 @@ export default class SortableTable {
     return sortType.filter((item) => item);
   }
 
-  sortByASC(node, idx, numeric) {
+  sortByASC(node, idx, isNumeric) {
     return Array.from(node).sort((a, b) => {
       let textA = a.querySelectorAll(".sortable-table__cell")[idx].textContent;
       let textB = b.querySelectorAll(".sortable-table__cell")[idx].textContent;
-      return textA.localeCompare(textB, undefined, { numeric: numeric });
+      return textA.localeCompare(textB, undefined, { numeric: isNumeric });
     });
   }
 
-  sortByDESC(node, idx, numeric) {
+  sortByDESC(node, idx, isNumeric) {
     return Array.from(node).sort((a, b) => {
       let textA = a.querySelectorAll(".sortable-table__cell")[idx].textContent;
       let textB = b.querySelectorAll(".sortable-table__cell")[idx].textContent;
-      return textB.localeCompare(textA, undefined, { numeric: numeric });
+      return textB.localeCompare(textA, undefined, { numeric: isNumeric });
     });
   }
 
-  sortByOrder(orderValue, node, idx, numeric) {
+  sortByOrder(orderValue, node, idx, isNumeric) {
     if (orderValue == "asc") {
-      return this.sortByASC(node, idx, numeric);
+      return this.sortByASC(node, idx, isNumeric);
     }
-    return this.sortByDESC(node, idx, numeric);
+    return this.sortByDESC(node, idx, isNumeric);
   }
 
   sort(fieldValue, orderValue) {
